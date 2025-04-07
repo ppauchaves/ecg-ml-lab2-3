@@ -100,13 +100,17 @@ print("[INFO] Dropping irrelevant metadata columns...")
 columns_to_keep = ['age', 'sex', 'diagnostic_superclass', 'bpm']
 Y_clean = Y[columns_to_keep].copy()
 Y_clean = Y_clean.dropna(subset=['age', 'sex', 'bpm'])  # Drop rows missing core info
+
+# === 7. REMOVE EMPTY LABELS ===
+print("[INFO] Removing entries with no diagnostic labels...")
+Y_clean = Y_clean[Y_clean['diagnostic_superclass'].apply(lambda x: len(x) > 0)].copy()
 X_filtered = X_filtered[:len(Y_clean)]
 
-# === 7. SAVE OUTPUT ===
+# === 8. SAVE OUTPUT ===
 print("[INFO] Saving filtered signals, labels, and R-peaks...")
 np.save(os.path.join(SAVE_PATH, 'X_filtered_group5.npy'), X_filtered)
 Y_clean.to_csv(os.path.join(SAVE_PATH, 'Y_labels_group5.csv'))
 with open(os.path.join(SAVE_PATH, 'r_peaks_group5.pkl'), 'wb') as f:
     pickle.dump(R_peaks_all, f)
 
-print("[✅ DONE] Preprocessing complete — filtered, cleaned, labeled dataset ready.")
+print("[✅ DONE] Preprocessing complete — cleaned and ready dataset saved.")
